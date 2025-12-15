@@ -15,6 +15,7 @@ export interface PricingPlan {
   features: string[];
   isPopular?: boolean;
   cta: string;
+  stripeLink?: string; // URL for Stripe Payment Link
 }
 
 export interface Feature {
@@ -34,4 +35,5 @@ export interface GHLPayload {
   consentEmail: boolean;
   consentSMS: boolean;
   tags: string[];
+  selectedPlan?: string;
 }

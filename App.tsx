@@ -12,8 +12,9 @@ import GetStartedModal from './components/GetStartedModal';
 import LiveAgentModal from './components/LiveAgentModal';
 import LogoTicker from './components/LogoTicker';
 import TestimonialCarousel from './components/TestimonialCarousel';
+import { PricingPlan } from './types';
 
-// Helper icon component since 'TrendingDown' isn't standard in all Lucide versions, using a fallback path or standard icon
+// Helper icon component since 'TrendingDown' isn't standard in all Lucide versions
 const TrendingDownIcon = ({ size, className }: { size?: number, className?: string }) => (
   <svg 
     width={size || 24} 
@@ -105,6 +106,45 @@ const IMPACT_STATS = [
     theme: "violet",
     numeric: 99.9,
     isDecimal: true
+  }
+];
+
+// --- Pricing Data ---
+
+// IMPORTANT: Replace the stripeLink values with your actual Stripe Payment Links
+const PRICING_PLANS: PricingPlan[] = [
+  {
+    name: "7-Day Trial",
+    price: "$97",
+    period: "one-time setup",
+    features: ["Full Platform Access", "Custom AI Agent Setup", "Live Call Handling", "CRM & Calendar Sync"],
+    cta: "Start 7-Day Trial",
+    stripeLink: "https://buy.stripe.com/test_1", // REPLACE THIS
+  },
+  {
+    name: "Starter",
+    price: "$497",
+    period: "/ month",
+    features: ["1 Dedicated AI Agent", "Inbound Call Handling", "Appointment Scheduling", "Basic CRM Integration", "Email Support"],
+    cta: "Select Starter",
+    stripeLink: "https://buy.stripe.com/test_2", // REPLACE THIS
+  },
+  {
+    name: "Growth",
+    price: "$997",
+    period: "/ month",
+    features: ["1-5 AI Agents", "Inbound & Outbound Calls", "Full CRM Automation", "SMS & Email Handling", "Priority Support", "Custom Workflows"],
+    cta: "Select Growth",
+    isPopular: true,
+    stripeLink: "https://buy.stripe.com/test_3", // REPLACE THIS
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "Contact Sales",
+    features: ["Dedicated infrastructure", "White-labeling", "SLA guarantees", "Custom AI Training", "Dedicated Account Manager"],
+    cta: "Contact Sales",
+    stripeLink: "", // Empty string means no direct payment link (Sales Inquiry)
   }
 ];
 
@@ -200,7 +240,6 @@ const Header = ({ onOpenForm, onOpenLive }: { onOpenForm: () => void, onOpenLive
     const targetId = href.replace('#', '');
     const element = document.getElementById(targetId);
     if (element) {
-      // Basic smooth scroll, scroll-margin-top CSS on sections handles the offset
       element.scrollIntoView({ behavior: 'smooth' });
       setMobileMenuOpen(false);
     }
@@ -265,61 +304,23 @@ const Header = ({ onOpenForm, onOpenLive }: { onOpenForm: () => void, onOpenLive
   );
 };
 
-// --- Pricing Data ---
-
-const PRICING_PLANS = [
-  {
-    name: "7-Day Trial",
-    price: "$97",
-    period: "one-time setup",
-    desc: "Experience the power of ARIA live.",
-    features: ["Full Platform Access", "Custom AI Agent Setup", "Live Call Handling", "CRM & Calendar Sync"],
-    cta: "Start 7-Day Trial",
-    variant: "standard",
-    delay: "0"
-  },
-  {
-    name: "Starter",
-    price: "$497",
-    period: "/ month",
-    features: ["1 Dedicated AI Agent", "Inbound Call Handling", "Appointment Scheduling", "Basic CRM Integration", "Email Support"],
-    cta: "Select Starter",
-    variant: "standard",
-    delay: "100"
-  },
-  {
-    name: "Growth",
-    price: "$997",
-    period: "/ month",
-    features: ["1-5 AI Agents", "Inbound & Outbound Calls", "Full CRM Automation", "SMS & Email Handling", "Priority Support", "Custom Workflows"],
-    cta: "Select Growth",
-    variant: "featured",
-    popular: true,
-    delay: "200"
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "Contact Sales",
-    desc: "Dedicated infrastructure, white-labeling, and SLA guarantees for large organizations.",
-    cta: "Contact Sales",
-    variant: "standard",
-    delay: "300"
-  }
-];
-
 // --- Main App ---
 
 export default function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLiveOpen, setIsLiveOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
 
-  const openForm = () => setIsFormOpen(true);
+  const openForm = (plan?: PricingPlan) => {
+    setSelectedPlan(plan || null);
+    setIsFormOpen(true);
+  };
+  
   const openLive = () => setIsLiveOpen(true);
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
-      <Header onOpenForm={openForm} onOpenLive={openLive} />
+      <Header onOpenForm={() => openForm()} onOpenLive={openLive} />
 
       <main>
         {/* HERO */}
@@ -345,7 +346,7 @@ export default function App() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" onClick={openForm} className="w-full sm:w-auto h-14 px-8 text-lg">Start 7-Day Trial</Button>
+              <Button size="lg" onClick={() => openForm(PRICING_PLANS[0])} className="w-full sm:w-auto h-14 px-8 text-lg">Start 7-Day Trial</Button>
               <Button size="lg" variant="outline" onClick={openLive} className="w-full sm:w-auto h-14 px-8 text-lg flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 Watch ARIA in Action
@@ -364,7 +365,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* TRUST TICKER (MANDATORY UPDATE) */}
+        {/* TRUST TICKER */}
         <section className="py-16 border-y border-slate-100 bg-slate-50/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <p className="text-center text-sm font-semibold text-slate-400 mb-10 tracking-widest uppercase">
@@ -374,7 +375,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* FEATURES (FULL GHL COVERAGE) */}
+        {/* FEATURES */}
         <section id="features" className="py-24 bg-white scroll-mt-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -402,9 +403,8 @@ export default function App() {
           </div>
         </section>
 
-        {/* INTELLIGENCE REDEFINED (COMPLETELY REDESIGNED) */}
+        {/* INTELLIGENCE REDEFINED */}
         <section className="py-32 bg-slate-950 text-white relative overflow-hidden">
-          {/* Subtle Background Mesh */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-20"></div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -441,7 +441,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* BUSINESS IMPACT (UPDATED METRICS WITH ANIMATION) */}
+        {/* BUSINESS IMPACT */}
         <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
              <div className="text-center mb-16">
@@ -456,9 +456,8 @@ export default function App() {
           </div>
         </section>
 
-        {/* SETUP (REDESIGNED) */}
+        {/* SETUP */}
         <section className="py-24 bg-white relative overflow-hidden">
-           {/* Decorative blobs */}
            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-violet-50 rounded-full blur-3xl opacity-50"></div>
 
@@ -478,7 +477,6 @@ export default function App() {
               </div>
               
               <div className="grid md:grid-cols-3 gap-8 relative">
-                 {/* Connecting Line (Desktop) */}
                  <div className="hidden md:block absolute top-16 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-blue-200 via-violet-200 to-amber-200 z-0"></div>
 
                  {[
@@ -509,18 +507,13 @@ export default function App() {
                  ].map((item, i) => (
                    <div key={i} className="relative z-10 group">
                       <div className="flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-slate-300/50 transition-all duration-500 hover:-translate-y-2">
-                         
-                         {/* Icon Container */}
                          <div className={`w-24 h-24 rounded-3xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-8 relative group-hover:scale-110 transition-transform duration-500 shadow-lg ${item.shadow}`}>
                             <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm border-4 border-white shadow-sm z-10">
                                {item.step}
                             </div>
                             <item.icon size={40} className="text-white drop-shadow-md" strokeWidth={1.5} />
-                            
-                            {/* Hover Glow Effect */}
                             <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-3xl"></div>
                          </div>
-
                          <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors">{item.title}</h3>
                          <p className="text-slate-500 leading-relaxed text-sm">{item.desc}</p>
                       </div>
@@ -530,9 +523,8 @@ export default function App() {
            </div>
         </section>
 
-        {/* TESTIMONIALS (REDESIGNED MASONRY) */}
+        {/* TESTIMONIALS */}
         <section id="testimonials" className="py-24 bg-slate-50 overflow-hidden relative scroll-mt-28">
-          {/* Subtle World Map SVG Background */}
           <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100%25\' height=\'100%25\' viewBox=\'0 0 1000 500\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M238,300 Q200,280 180,320 T150,350 Q180,380 220,360 T238,300 M500,100 Q450,80 420,120 T400,180 Q450,220 520,200 T550,140 Q540,110 500,100 M750,150 Q700,120 680,160 T650,220 Q700,250 780,230 T800,180 Q790,160 750,150\' fill=\'%23000\' /%3E%3C/svg%3E")' }}></div>
           
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -553,14 +545,14 @@ export default function App() {
             <TestimonialCarousel />
             
             <div className="mt-16 text-center">
-              <Button size="lg" variant="outline" onClick={openForm}>
+              <Button size="lg" variant="outline" onClick={() => openForm()}>
                 Read More Customer Stories
               </Button>
             </div>
           </div>
         </section>
 
-        {/* PRICING (REDESIGNED) */}
+        {/* PRICING */}
         <section id="pricing" className="py-24 bg-white scroll-mt-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -574,37 +566,31 @@ export default function App() {
                   key={idx}
                   className={`
                     relative flex flex-col p-8 rounded-[2rem] transition-all duration-300 group
-                    ${plan.variant === 'featured' 
+                    ${plan.isPopular 
                       ? 'bg-slate-900 text-white shadow-2xl scale-105 z-10 border border-slate-700' 
                       : 'bg-white text-slate-900 border border-slate-200 hover:border-blue-400 hover:shadow-2xl hover:scale-105 hover:z-20'
                     }
                   `}
                 >
-                  {plan.popular && (
+                  {plan.isPopular && (
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600 to-violet-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide shadow-lg shadow-blue-500/30 ring-4 ring-white dark:ring-slate-950">
                       Most Popular
                     </div>
                   )}
 
-                  <h3 className={`text-lg font-semibold mb-2 ${plan.variant === 'featured' ? 'text-white' : 'text-slate-900'}`}>{plan.name}</h3>
+                  <h3 className={`text-lg font-semibold mb-2 ${plan.isPopular ? 'text-white' : 'text-slate-900'}`}>{plan.name}</h3>
                   <div className="mb-6">
-                    <span className={`text-4xl font-bold ${plan.variant === 'featured' ? 'text-white' : 'text-slate-900'}`}>{plan.price}</span>
-                    <span className={`text-sm block mt-1 ${plan.variant === 'featured' ? 'text-slate-400' : 'text-slate-500'}`}>{plan.period}</span>
+                    <span className={`text-4xl font-bold ${plan.isPopular ? 'text-white' : 'text-slate-900'}`}>{plan.price}</span>
+                    <span className={`text-sm block mt-1 ${plan.isPopular ? 'text-slate-400' : 'text-slate-500'}`}>{plan.period}</span>
                   </div>
 
-                  {plan.desc && (
-                    <p className={`text-sm mb-6 ${plan.variant === 'featured' ? 'text-slate-300' : 'text-slate-500'}`}>
-                      {plan.desc}
-                    </p>
-                  )}
-
                   {plan.features && (
-                    <ul className={`space-y-4 mb-8 text-sm flex-1 ${plan.variant === 'featured' ? 'text-slate-300' : 'text-slate-600'}`}>
+                    <ul className={`space-y-4 mb-8 text-sm flex-1 ${plan.isPopular ? 'text-slate-300' : 'text-slate-600'}`}>
                       {plan.features.map((feature, fIdx) => (
                         <li key={fIdx} className="flex items-start gap-3">
                           <CheckCircle2 
                             size={18} 
-                            className={`flex-shrink-0 mt-0.5 ${plan.variant === 'featured' ? 'text-blue-400' : 'text-blue-600'}`} 
+                            className={`flex-shrink-0 mt-0.5 ${plan.isPopular ? 'text-blue-400' : 'text-blue-600'}`} 
                           />
                           <span className="leading-snug">{feature}</span>
                         </li>
@@ -615,9 +601,9 @@ export default function App() {
                   <div className="mt-auto">
                     <Button 
                       fullWidth 
-                      variant={plan.variant === 'featured' ? 'white' : 'outline'} 
-                      onClick={openForm}
-                      className={plan.variant === 'standard' ? 'group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900' : ''}
+                      variant={plan.isPopular ? 'white' : 'outline'} 
+                      onClick={() => openForm(plan)}
+                      className={!plan.isPopular ? 'group-hover:bg-slate-900 group-hover:text-white group-hover:border-slate-900' : ''}
                     >
                       {plan.cta}
                     </Button>
@@ -650,7 +636,7 @@ export default function App() {
           <div className="max-w-3xl mx-auto px-4">
             <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-8 tracking-tight">Transform Your Business Today</h2>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" onClick={openForm} className="h-14 px-10 text-lg">Start 7-Day Trial</Button>
+              <Button size="lg" onClick={() => openForm(PRICING_PLANS[0])} className="h-14 px-10 text-lg">Start 7-Day Trial</Button>
               <Button size="lg" variant="secondary" onClick={openLive} className="h-14 px-10 text-lg flex items-center gap-2">
                 <Phone size={20} /> Speak with ARIA
               </Button>
@@ -678,7 +664,7 @@ export default function App() {
 
         {/* Mobile Sticky CTA */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 z-30 safe-bottom">
-           <Button fullWidth onClick={openForm}>Start 7-Day Trial</Button>
+           <Button fullWidth onClick={() => openForm(PRICING_PLANS[0])}>Start 7-Day Trial</Button>
         </div>
 
       </main>
@@ -686,7 +672,8 @@ export default function App() {
       <GetStartedModal 
         isOpen={isFormOpen} 
         onClose={() => setIsFormOpen(false)} 
-        openLiveDemo={() => { setIsFormOpen(false); openLive(); }} 
+        openLiveDemo={() => { setIsFormOpen(false); openLive(); }}
+        selectedPlan={selectedPlan}
       />
       <LiveAgentModal 
         isOpen={isLiveOpen} 
