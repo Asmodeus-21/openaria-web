@@ -1,0 +1,7 @@
+{
+  "name": "ARIA - The World's #1 AI Receptionist",
+  "description": "Professional, reliable, limitless AI receptionist powered by Gemini 3.0. Replaces human front-desk operations for businesses worldwide.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
