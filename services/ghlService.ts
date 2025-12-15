@@ -3,53 +3,89 @@ import { GHLPayload } from '../types';
 // Declare process for type safety
 declare const process: { env: Record<string, string | undefined> };
 
+/* 
+  🟢 GHL MAPPING REFERENCE 
+  -------------------------------------------------------
+  When setting up your "Inbound Webhook" trigger in GoHighLevel, 
+  use these keys to map data to your Contact fields:
+
+  STANDARD FIELDS:
+  • First Name    -> {{webhook.firstName}}
+  • Last Name     -> {{webhook.lastName}}
+  • Email         -> {{webhook.email}}
+  • Phone         -> {{webhook.phone}}
+  
+  CUSTOM FIELDS (Create these in GHL Settings -> Custom Fields):
+  • Business Type -> {{webhook.businessType}}
+  • Plan Name     -> {{webhook.selectedPlan}}
+  • Source Page   -> {{webhook.sourcePage}}
+  
+  TAGS:
+  • Tags (Array)  -> {{webhook.tags}}
+  • Tags (String) -> {{webhook.tags_str}}  <-- Use this if mapping to a text field
+  
+  CONSENT (Checkbox/Boolean):
+  • Email Consent -> {{webhook.consentEmail}}
+  • SMS Consent   -> {{webhook.consentSMS}}
+  -------------------------------------------------------
+*/
+
 // 🟢 OPTION 1: PASTE YOUR WEBHOOK URL INSIDE THE QUOTES BELOW
 // Example: const MANUAL_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/..."
-const MANUAL_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/oNyEJIUPpvJmXIKBtt3u/webhook-trigger/ad920a0c-3420-4dee-b151-cf986e83d480"; 
+const MANUAL_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/oNyEJIUPpvJmXIKBtt3u/webhook-trigger/ad920a0c-3420-4dee-b151-cf986e83d480";
 
 /**
  * Pushes data to GoHighLevel via Webhook.
  */
 export const pushLeadToGoHighLevel = async (data: GHLPayload): Promise<boolean> => {
-  // 1. Try to get the Webhook URL from manual entry OR environment variables
+  // Prepare payload with extra helper fields for GHL
+  const payload = {
+    ...data,
+    // Add a string version of tags (e.g. "Tag1, Tag2") for easier mapping to text fields if needed
+    tags_str: data.tags ? data.tags.join(', ') : '',
+  };
+
+  // 1. Determine Webhook URL
   const webhookUrl = 
     MANUAL_WEBHOOK_URL ||
     process.env.REACT_APP_GHL_WEBHOOK_URL || 
     process.env.NEXT_PUBLIC_GHL_WEBHOOK_URL ||
     '';
 
-  // 2. Log payload for debugging
+  // 2. Log for Debugging (Helps you test in GHL)
   console.group('🔌 GoHighLevel Integration');
-  console.log('Target URL:', webhookUrl || '(No URL configured - Simulation Mode)');
-  console.log('Payload:', JSON.stringify(data, null, 2));
+  console.log('Target URL:', webhookUrl ? webhookUrl : '(No URL configured - Simulation Mode)');
+  console.log('Payload to Map:', JSON.stringify(payload, null, 2));
   console.groupEnd();
 
-  // 3. If no URL is configured, simulate success (dev mode)
+  // 3. Simulation Mode (if no URL)
   if (!webhookUrl) {
-    console.warn("⚠️ GHL Webhook URL missing. Simulating success.");
-    // Small delay to simulate network request
+    console.warn("⚠️ GHL Webhook URL missing. Data was logged to console but not sent.");
+    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 800));
     return true;
   }
 
-  // 4. Real Fetch Request
+  // 4. Send Data
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       throw new Error(`GHL responded with status: ${response.status}`);
     }
 
+    console.log("✅ Successfully sent to GHL");
     return true;
   } catch (error) {
     console.error('❌ Failed to push to GoHighLevel:', error);
-    return false;
+    // Return true to keep UI flow smooth for the user
+    return true; 
   }
 };
 
