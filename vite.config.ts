@@ -3,13 +3,15 @@ import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // Fix for TS error: Property 'cwd' does not exist on type 'Process'
+  // Load env file based on `mode` in the current working directory.
+  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, (process as any).cwd(), '');
+
   return {
     plugins: [react()],
     define: {
-      // This enables process.env.REACT_APP_... to work in the browser
-      'process.env': env
+      // Safely stringify values to avoid replacement errors
+      'process.env': JSON.stringify(env)
     }
   };
 });

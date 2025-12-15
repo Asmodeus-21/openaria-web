@@ -1,15 +1,19 @@
 import { GHLPayload } from '../types';
 
+// 🟢 OPTION 1: PASTE YOUR WEBHOOK URL INSIDE THE QUOTES BELOW
+// Example: const MANUAL_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/..."
+const MANUAL_WEBHOOK_URL = ""; 
+
 /**
  * Pushes data to GoHighLevel via Webhook.
- * Set REACT_APP_GHL_WEBHOOK_URL or NEXT_PUBLIC_GHL_WEBHOOK_URL in your Vercel/Env settings.
  */
 export const pushLeadToGoHighLevel = async (data: GHLPayload): Promise<boolean> => {
-  // 1. Try to get the Webhook URL from environment variables
+  // 1. Try to get the Webhook URL from manual entry OR environment variables
   const webhookUrl = 
+    MANUAL_WEBHOOK_URL ||
     (typeof process !== 'undefined' ? process.env.REACT_APP_GHL_WEBHOOK_URL : undefined) || 
     (typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_GHL_WEBHOOK_URL : undefined) ||
-    ''; // Fallback to empty if not found
+    '';
 
   // 2. Log payload for debugging
   console.group('🔌 GoHighLevel Integration');
@@ -19,7 +23,8 @@ export const pushLeadToGoHighLevel = async (data: GHLPayload): Promise<boolean> 
 
   // 3. If no URL is configured, simulate success (dev mode)
   if (!webhookUrl) {
-    console.warn("⚠️ GHL Webhook URL missing. Simulating success. Add REACT_APP_GHL_WEBHOOK_URL to your env variables.");
+    console.warn("⚠️ GHL Webhook URL missing. Simulating success.");
+    // Small delay to simulate network request
     await new Promise((resolve) => setTimeout(resolve, 800));
     return true;
   }
@@ -41,13 +46,10 @@ export const pushLeadToGoHighLevel = async (data: GHLPayload): Promise<boolean> 
     return true;
   } catch (error) {
     console.error('❌ Failed to push to GoHighLevel:', error);
-    // In production, you might want to return false here to show an error to the user,
-    // or return true to fallback to email/other methods.
     return false;
   }
 };
 
 export const logCallIntent = async (intent: string, duration: number): Promise<void> => {
-  // This can also be hooked up to a webhook to log call stats
   console.log(`🎙️ Logged Call Intent to GHL: ${intent} (${duration}s)`);
 };
