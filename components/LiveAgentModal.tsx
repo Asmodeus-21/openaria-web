@@ -139,8 +139,12 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       audioSource.connect(scriptProcessor);
       scriptProcessor.connect(inputContextRef.current.destination);
 
-      // 4. Connect to ElevenLabs WebSocket
-      const ws = new WebSocket(ELEVENLABS_WS_URL);
+      // 4. Connect to ElevenLabs WebSocket with API key
+      const apiKey = (import.meta.env as any).VITE_ELEVENLABS_API_KEY || '';
+      const wsUrlWithAuth = apiKey 
+        ? `${ELEVENLABS_WS_URL}&authorization=${apiKey}`
+        : ELEVENLABS_WS_URL;
+      const ws = new WebSocket(wsUrlWithAuth);
       wsRef.current = ws;
 
       ws.onopen = () => {
