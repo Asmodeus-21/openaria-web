@@ -40,7 +40,7 @@ interface ElevenLabsMessage {
   [key: string]: any;
 }
 
-const ELEVENLABS_AGENT_ID = 'agent_6101kca9aevaet99t6gs7fsyjjv6';
+const ELEVENLABS_AGENT_ID = 'agent_7701kcj3ms7tff8tkh857ssbn604';
 const ELEVENLABS_WS_URL = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${ELEVENLABS_AGENT_ID}`;
 
 const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
