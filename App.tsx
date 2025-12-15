@@ -111,7 +111,14 @@ const IMPACT_STATS = [
 
 // --- Pricing Data ---
 
-// IMPORTANT: Replace the stripeLink values with your actual Stripe Payment Links
+// Retrieves env variable with multiple fallbacks
+const getEnv = (key: string) => {
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key] || process.env[`REACT_APP_${key}`] || process.env[`NEXT_PUBLIC_${key}`] || '';
+  }
+  return '';
+};
+
 const PRICING_PLANS: PricingPlan[] = [
   {
     name: "7-Day Trial",
@@ -119,7 +126,7 @@ const PRICING_PLANS: PricingPlan[] = [
     period: "one-time setup",
     features: ["Full Platform Access", "Custom AI Agent Setup", "Live Call Handling", "CRM & Calendar Sync"],
     cta: "Start 7-Day Trial",
-    stripeLink: "https://buy.stripe.com/test_1", // REPLACE THIS
+    stripeLink: getEnv('STRIPE_TRIAL_LINK') || '', 
   },
   {
     name: "Starter",
@@ -127,7 +134,7 @@ const PRICING_PLANS: PricingPlan[] = [
     period: "/ month",
     features: ["1 Dedicated AI Agent", "Inbound Call Handling", "Appointment Scheduling", "Basic CRM Integration", "Email Support"],
     cta: "Select Starter",
-    stripeLink: "https://buy.stripe.com/test_2", // REPLACE THIS
+    stripeLink: getEnv('STRIPE_STARTER_LINK') || '',
   },
   {
     name: "Growth",
@@ -136,7 +143,7 @@ const PRICING_PLANS: PricingPlan[] = [
     features: ["1-5 AI Agents", "Inbound & Outbound Calls", "Full CRM Automation", "SMS & Email Handling", "Priority Support", "Custom Workflows"],
     cta: "Select Growth",
     isPopular: true,
-    stripeLink: "https://buy.stripe.com/test_3", // REPLACE THIS
+    stripeLink: getEnv('STRIPE_GROWTH_LINK') || '',
   },
   {
     name: "Enterprise",
@@ -144,7 +151,7 @@ const PRICING_PLANS: PricingPlan[] = [
     period: "Contact Sales",
     features: ["Dedicated infrastructure", "White-labeling", "SLA guarantees", "Custom AI Training", "Dedicated Account Manager"],
     cta: "Contact Sales",
-    stripeLink: "", // Empty string means no direct payment link (Sales Inquiry)
+    stripeLink: "", // Enterprise usually requires a sales call
   }
 ];
 
@@ -672,13 +679,4 @@ export default function App() {
       <GetStartedModal 
         isOpen={isFormOpen} 
         onClose={() => setIsFormOpen(false)} 
-        openLiveDemo={() => { setIsFormOpen(false); openLive(); }}
-        selectedPlan={selectedPlan}
-      />
-      <LiveAgentModal 
-        isOpen={isLiveOpen} 
-        onClose={() => setIsLiveOpen(false)} 
-      />
-    </div>
-  );
-}
+        openLive
