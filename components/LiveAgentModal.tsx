@@ -169,10 +169,19 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
         try {
           const message: ElevenLabsMessage = JSON.parse(event.data);
           console.log('📨 WebSocket message received:', message.type);
+          
+          // Debug: log full message for audio types
+          if (message.type === 'audio') {
+            console.log('🔍 Full audio message:', JSON.stringify(message).substring(0, 200));
+            console.log('🔍 Message keys:', Object.keys(message));
+            console.log('🔍 message.audio:', message.audio);
+            console.log('🔍 message.data:', (message as any).data);
+          }
 
           // Handle agent audio response
-          if (message.type === 'audio' && message.audio) {
-            console.log('🔊 Playing agent audio, data length:', message.audio.length);
+          if (message.type === 'audio' && (message.audio || (message as any).data)) {
+            const audioData = message.audio || (message as any).data;
+            console.log('🔊 Playing agent audio, data length:', audioData.length);
             setIsAgentSpeaking(true);
             
             if (!outputContextRef.current) {
@@ -191,7 +200,7 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
               
               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
 
-              const audioBuffer = await decodeAudioData(message.audio, ctx, 24000);
+              const audioBuffer = await decodeAudioData(audioData, ctx, 24000);
               console.log('✓ Audio decoded, duration:', audioBuffer.duration, 'sampleRate:', audioBuffer.sampleRate);
               
               const bufferSource = ctx.createBufferSource();
