@@ -64,17 +64,20 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
 
   // Establish WebSocket connection and initialize audio
   const startSession = async () => {
+    console.log('🚀 Starting ARIA voice session...');
     setError(null);
     setIsConnecting(true);
 
     try {
       // 1. Audio Context Setup
+      console.log('🔧 Creating AudioContext with 16kHz sample rate...');
       inputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ 
         sampleRate: 16000 
       });
       outputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ 
         sampleRate: 24000 
       });
+      console.log('✓ AudioContext created');
       
       outputNodeRef.current = outputContextRef.current.createGain();
       outputNodeRef.current.connect(outputContextRef.current.destination);
@@ -82,6 +85,7 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       audioSourcesRef.current = [];
 
       // 2. Request microphone access (early to show permission dialog)
+      console.log('🎤 Requesting microphone access...');
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ 
@@ -91,8 +95,9 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
             autoGainControl: true 
           } 
         });
+        console.log('✓ Microphone access granted');
       } catch (err) {
-        console.error("Microphone error:", err);
+        console.error("❌ Microphone error:", err);
         setError("Could not access microphone. Please check permissions.");
         setIsConnecting(false);
         return;
@@ -112,6 +117,7 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       const scriptProcessor = inputContextRef.current.createScriptProcessor(4096, 1, 1);
       processorRef.current = scriptProcessor;
 
+      let audioChunkCount = 0;
       scriptProcessor.onaudioprocess = (e) => {
         // Don't send audio if muted or WebSocket not ready
         if (isMutedRef.current || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
@@ -121,6 +127,11 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
           
           // Convert to base64 directly (already at 16kHz from audio context)
           const base64Audio = pcmToBase64(inputData);
+          audioChunkCount++;
+          
+          if (audioChunkCount % 10 === 0) {
+            console.log(`🎤 Audio chunk ${audioChunkCount} sent (${base64Audio.length} bytes)`);
+          }
           
           // Send to ElevenLabs WebSocket
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -129,29 +140,36 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
             }));
           }
         } catch (err) {
-          console.error("Error processing audio chunk:", err);
+          console.error("❌ Error processing audio chunk:", err);
         }
       };
 
       audioSource.connect(scriptProcessor);
       // Don't connect to destination - only send to WebSocket
       // scriptProcessor.connect(inputContextRef.current.destination);
+      console.log('✓ Audio processor connected');
 
       // 4. Connect to ElevenLabs WebSocket
+      console.log('🔗 Connecting to ElevenLabs WebSocket...');
+      console.log('📡 URL:', ELEVENLABS_WS_URL);
       const ws = new WebSocket(ELEVENLABS_WS_URL);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('Connected to ElevenLabs Conversational AI');
+        console.log('✅ WebSocket Connected to ElevenLabs');
+        console.log('📤 Sending conversation initiation message...');
         
         // CRITICAL: Send conversation initiation message
         // This tells ElevenLabs to start the conversation
-        ws.send(JSON.stringify({
+        const initMessage = {
           type: 'conversation_initiation_client_data',
           conversation_config: {
             agent_id: ELEVENLABS_AGENT_ID
           }
-        }));
+        };
+        
+        console.log('📨 Init message:', JSON.stringify(initMessage));
+        ws.send(JSON.stringify(initMessage));
         
         setIsConnected(true);
         setIsConnecting(false);
@@ -160,10 +178,14 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
 
       ws.onmessage = async (event) => {
         try {
+          console.log('📨 Message from ElevenLabs:', event.data.substring(0, 200));
           const message: ElevenLabsMessage = JSON.parse(event.data);
+          console.log('✓ Parsed message type:', message.type);
 
           // Handle audio output from agent
           if (message.type === 'audio' && message.audio) {
+            console.log('🔊 Received audio from agent');
+            setIsAgentSpeaking(true);
             setIsAgentSpeaking(true);
             
             if (!outputContextRef.current) return;
@@ -235,19 +257,32 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       };
 
       ws.onerror = (event) => {
-        console.error('WebSocket error:', event);
-        console.error('WebSocket ready state:', ws.readyState);
-        console.error('WebSocket URL:', ELEVENLABS_WS_URL);
-        setError('Connection error. Please try again.');
+        const errorMsg = `❌ WebSocket Error! Ready state: ${ws.readyState}`;
+        console.error(errorMsg);
+        console.error('Event:', event);
+        console.error('Agent ID:', ELEVENLABS_AGENT_ID);
+        setError(errorMsg);
         setIsConnected(false);
         setIsConnecting(false);
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket closed');
-        console.log('Close code:', event.code);
-        console.log('Close reason:', event.reason);
-        console.log('Was clean:', event.wasClean);
+        const closeMsg = `❌ WebSocket Closed - Code: ${event.code}, Clean: ${event.wasClean}, Reason: "${event.reason || 'No reason provided'}"`;
+        console.error(closeMsg);
+        console.error('Full event:', event);
+        
+        // Provide helpful error messages based on close code
+        let userMessage = 'Connection closed.';
+        if (event.code === 1008) {
+          userMessage = 'Policy violation - Check your Agent ID or API key.';
+        } else if (event.code === 1006) {
+          userMessage = 'Abnormal closure - Check network connection.';
+        } else if (event.code === 1000) {
+          userMessage = 'Connection closed normally.';
+        }
+        
+        console.error(`📋 User Message: ${userMessage}`);
+        setError(userMessage);
         setIsConnected(false);
         setIsConnecting(false);
         setIsAgentSpeaking(false);
