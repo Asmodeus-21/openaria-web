@@ -67,7 +67,7 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
   const wsRef = useRef<WebSocket | null>(null);
   const nextStartTimeRef = useRef<number>(0);
   const streamRef = useRef<MediaStream | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const audioSourcesRef = useRef<AudioBufferSourceNode[]>([]);
   const isMutedRef = useRef(isMuted);
@@ -105,37 +105,53 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
 
       streamRef.current = stream;
 
-      // Setup audio input processing using ScriptProcessor (simpler for now, can migrate to AudioWorklet later)
+      // Setup audio input processing using AudioWorkletNode (replaces deprecated ScriptProcessorNode)
       if (!inputContextRef.current) throw new Error('Audio context not initialized');
       
       const audioSource = inputContextRef.current.createMediaStreamSource(stream);
       sourceRef.current = audioSource;
       
-      // Use ScriptProcessor - will migrate to AudioWorklet for better performance
-      const scriptProcessor = inputContextRef.current.createScriptProcessor(4096, 1, 1);
-      processorRef.current = scriptProcessor;
+      // Load and register the audio worklet
+      console.log('⚙️ Loading audio worklet processor...');
+      try {
+        await inputContextRef.current.audioWorklet.addModule('/audioWorklet.js');
+        console.log('✓ Audio worklet loaded');
+      } catch (err) {
+        console.warn('⚠️ AudioWorklet not available, using fallback:', err);
+        // Fallback to a simpler approach if AudioWorklet fails
+        setError('Audio processing unavailable on this browser');
+        setIsConnecting(false);
+        return;
+      }
 
-      scriptProcessor.onaudioprocess = (e) => {
-        // Skip if muted or WebSocket not ready
-        if (isMutedRef.current || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-        
-        try {
-          const inputData = e.inputBuffer.getChannelData(0);
-          const base64Audio = pcmToBase64(inputData);
+      // Create AudioWorkletNode
+      const workletNode = new AudioWorkletNode(inputContextRef.current, 'audio-input-processor');
+      workletNodeRef.current = workletNode;
+
+      // Handle audio data from the worklet
+      workletNode.port.onmessage = (event) => {
+        if (event.data.type === 'audio' && event.data.data) {
+          // Skip if muted or WebSocket not ready
+          if (isMutedRef.current || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
           
-          // Send audio chunk to ElevenLabs
-          wsRef.current.send(JSON.stringify({
-            user_audio_chunk: base64Audio
-          }));
-        } catch (err) {
-          console.error("Error sending audio:", err);
+          try {
+            const inputData = event.data.data;
+            const base64Audio = pcmToBase64(inputData);
+            
+            // Send audio chunk to ElevenLabs
+            wsRef.current.send(JSON.stringify({
+              user_audio_chunk: base64Audio
+            }));
+          } catch (err) {
+            console.error("Error sending audio:", err);
+          }
         }
       };
 
-      audioSource.connect(scriptProcessor);
-      // Connect to destination for audio loopback (optional - remove if not needed)
-      scriptProcessor.connect(inputContextRef.current.destination);
-      console.log('✓ Audio input ready');
+      // Connect audio graph: microphone → worklet → destination
+      audioSource.connect(workletNode);
+      workletNode.connect(inputContextRef.current.destination);
+      console.log('✓ Audio input ready (using AudioWorkletNode)');
 
       // Connect to ElevenLabs
       console.log('🔗 Connecting WebSocket to:', ELEVENLABS_WS_URL);
@@ -243,9 +259,10 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       streamRef.current = null;
     }
     
-    if (processorRef.current) {
-      processorRef.current.disconnect();
-      processorRef.current = null;
+    // Disconnect AudioWorkletNode
+    if (workletNodeRef.current) {
+      workletNodeRef.current.disconnect();
+      workletNodeRef.current = null;
     }
     
     if (sourceRef.current) {
@@ -273,9 +290,13 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
     setIsMuted(!isMuted);
   };
 
-  // Update isMutedRef whenever isMuted changes
+  // Update isMutedRef whenever isMuted changes and notify worklet
   useEffect(() => {
     isMutedRef.current = isMuted;
+    // Notify the worklet about mute state changes
+    if (workletNodeRef.current) {
+      workletNodeRef.current.port.postMessage({ type: 'mute', value: isMuted });
+    }
   }, [isMuted]);
 
   useEffect(() => {
