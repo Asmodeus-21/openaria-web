@@ -4,7 +4,7 @@
  * Replaces deprecated ScriptProcessorNode
  */
 
-class AudioWorkletProcessor extends AudioWorkletProcessor {
+class MicrophoneProcessor extends AudioWorkletProcessor {
   private isMuted: boolean = false;
 
   constructor() {
@@ -40,4 +40,4 @@ class AudioWorkletProcessor extends AudioWorkletProcessor {
 }
 
 // Register the processor
-registerProcessor('audio-input-processor', AudioWorkletProcessor);
+registerProcessor('audio-input-processor', MicrophoneProcessor);
