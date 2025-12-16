@@ -84,37 +84,37 @@ export const decodeAudioData = async (
 };
 
 /**
- * Resample audio from one sample rate to another
- * @param audioData Float32Array of audio samples
- * @param fromSampleRate Current sample rate
- * @param toSampleRate Target sample rate
- * @returns Resampled Float32Array
+ * Resample AudioBuffer from one sample rate to another
+ * @param audioBuffer AudioBuffer to resample
+ * @param targetSampleRate Target sample rate
+ * @param targetContext AudioContext with target sample rate
+ * @returns Resampled AudioBuffer
  */
 export const resampleAudio = async (
-  audioData: Float32Array,
-  fromSampleRate: number,
-  toSampleRate: number
-): Promise<Float32Array> => {
+  audioBuffer: AudioBuffer,
+  targetSampleRate: number,
+  targetContext: AudioContext
+): Promise<AudioBuffer> => {
   // If sample rates match, return as-is
-  if (fromSampleRate === toSampleRate) {
-    return audioData;
+  if (audioBuffer.sampleRate === targetSampleRate) {
+    return audioBuffer;
   }
 
   // Use OfflineAudioContext for resampling
+  const ratio = targetSampleRate / audioBuffer.sampleRate;
+  const newLength = Math.ceil(audioBuffer.length * ratio);
+  
   const offlineCtx = new OfflineAudioContext(
-    1,
-    Math.ceil(audioData.length * (toSampleRate / fromSampleRate)),
-    toSampleRate
+    audioBuffer.numberOfChannels,
+    newLength,
+    targetSampleRate
   );
 
-  const buffer = offlineCtx.createBuffer(1, audioData.length, fromSampleRate);
-  buffer.getChannelData(0).set(audioData);
-
   const source = offlineCtx.createBufferSource();
-  source.buffer = buffer;
+  source.buffer = audioBuffer;
   source.connect(offlineCtx.destination);
   source.start(0);
 
-  const offlineBuffer = await offlineCtx.startRendering();
-  return offlineBuffer.getChannelData(0);
+  const resampledBuffer = await offlineCtx.startRendering();
+  return resampledBuffer;
 };

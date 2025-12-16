@@ -82,13 +82,14 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       // Setup audio contexts for input and output
       console.log('🔧 Creating audio contexts...');
       inputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      outputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      // Use system's default sample rate for output (typically 48000 Hz)
+      outputContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
       
       outputNodeRef.current = outputContextRef.current.createGain();
       outputNodeRef.current.connect(outputContextRef.current.destination);
       nextStartTimeRef.current = 0;
       audioSourcesRef.current = [];
-      console.log('✓ Audio contexts ready');
+      console.log('✓ Audio contexts ready. Output sample rate:', outputContextRef.current.sampleRate);
 
       // Request microphone access
       console.log('🎤 Requesting microphone...');
@@ -192,8 +193,16 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
               
               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
 
-              const audioBuffer = await decodeAudioData(audioData, ctx, 24000);
+              // Decode audio at 24000 Hz (ElevenLabs rate)
+              let audioBuffer = await decodeAudioData(audioData, ctx, 24000);
               console.log('✓ Audio decoded, duration:', audioBuffer.duration, 'sampleRate:', audioBuffer.sampleRate);
+              
+              // Resample if output context uses different sample rate
+              if (ctx.sampleRate !== 24000) {
+                console.log('🔄 Resampling from 24000 Hz to', ctx.sampleRate, 'Hz');
+                audioBuffer = await resampleAudio(audioBuffer, ctx.sampleRate, ctx);
+                console.log('✓ Resampled, new duration:', audioBuffer.duration);
+              }
               
               const bufferSource = ctx.createBufferSource();
               bufferSource.buffer = audioBuffer;
