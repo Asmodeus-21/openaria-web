@@ -247,6 +247,9 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
           return;
         }
         
+        // Debug: Log that we received audio data
+        console.log('📦 handleAudioData called with', inputData.length, 'samples');
+        
         try {
           // CRITICAL: Make a copy of the input data because Web Audio API reuses buffers
           // If we don't copy, we'll be encoding stale/recycled data
@@ -254,7 +257,7 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
           
           // Check if we're actually capturing audio (not all zeros)
           const max = Math.max(...Array.from(audioDataCopy).map(Math.abs));
-          console.log('🎤 Audio captured - peak level:', max.toFixed(4), 'samples:', audioDataCopy.length);
+          console.log('🎤 Audio captured - peak level:', max.toFixed(6), 'samples:', audioDataCopy.length, 'ws state:', wsRef.current?.readyState);
           
           // Note: Low peak levels are normal for microphone input and are amplified by the GainNode
           // Only warn if audio is completely silent (peak near zero)

@@ -20,19 +20,37 @@ class MicrophoneProcessor extends AudioWorkletProcessor {
   process(inputs, outputs, parameters) {
     const input = inputs[0];
     
+    // Debug: Log connection status
+    if (!this.frameCounter) this.frameCounter = 0;
+    this.frameCounter++;
+    if (this.frameCounter % 100 === 0) {
+      console.log('[AudioWorklet] Processing frame', this.frameCounter, 'muted:', this.isMuted, 'has input:', !!input, 'has channel:', !!(input && input[0]));
+    }
+    
     // Skip if no input or muted
-    if (!input || !input[0] || this.isMuted) {
+    if (!input || !input[0]) {
+      return true;
+    }
+
+    if (this.isMuted) {
       return true;
     }
 
     const channelData = input[0];
+    
+    // Calculate peak level to verify we're capturing real audio
+    let max = 0;
+    for (let i = 0; i < channelData.length; i++) {
+      max = Math.max(max, Math.abs(channelData[i]));
+    }
     
     // Send audio chunk to main thread for WebSocket transmission
     // We send a copy to avoid issues with buffer reuse
     const audioData = new Float32Array(channelData);
     this.port.postMessage({
       type: 'audio',
-      data: audioData
+      data: audioData,
+      peakLevel: max
     });
 
     return true;
