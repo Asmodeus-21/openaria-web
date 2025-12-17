@@ -221,8 +221,8 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
       // Add input gain node to amplify quiet microphone input
       // Microphone input is often very weak and needs amplification for proper encoding
       const inputGainNode = inputContextRef.current.createGain();
-      inputGainNode.gain.value = 3; // Amplify by 3x (can be adjusted 1-10 based on needs)
-      console.log('🔊 Input gain set to 3x amplification');
+      inputGainNode.gain.value = 8; // Amplify by 8x (increased from 3x for stronger input signal)
+      console.log('🔊 Input gain set to 8x amplification');
       
       // Connect: microphone → gain → processing
       audioSource.connect(inputGainNode);
@@ -259,10 +259,11 @@ const LiveAgentModal: React.FC<LiveAgentModalProps> = ({ isOpen, onClose }) => {
           const max = Math.max(...Array.from(audioDataCopy).map(Math.abs));
           console.log('🎤 Audio captured - peak level:', max.toFixed(6), 'samples:', audioDataCopy.length, 'ws state:', wsRef.current?.readyState);
           
-          // Note: Low peak levels are normal for microphone input and are amplified by the GainNode
-          // Only warn if audio is completely silent (peak near zero)
-          if (max < 0.00001) {
-            console.warn('⚠️ Audio may be completely silent - verify microphone is working');
+          // Diagnostic: Flag if audio is extremely quiet (may indicate permission issue or hardware mute)
+          if (max < 0.0001) {
+            console.warn('⚠️ VERY QUIET AUDIO DETECTED (peak: ' + max.toFixed(8) + ') - Check: 1) Microphone muted in browser? 2) System mic volume low? 3) Browser permissions?');
+          } else if (max < 0.001) {
+            console.log('ℹ️ Microphone input is quiet but acceptable. Peak:', max.toFixed(6));
           }
           
           const base64Audio = pcmToBase64(audioDataCopy);
