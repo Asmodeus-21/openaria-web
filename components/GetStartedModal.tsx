@@ -31,8 +31,8 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
     email: '',
     phone: '',
     businessType: '',
-    consentEmail: false,
     consentSMS: false,
+    consentTransactional: false,
   });
 
   if (!isOpen) return null;
@@ -157,11 +157,11 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
               <div className="space-y-3 pt-2">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input 
-                    type="checkbox" required name="consentEmail" checked={formData.consentEmail} onChange={handleChange}
+                    type="checkbox" required name="consentTransactional" checked={formData.consentTransactional} onChange={handleChange}
                     className="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                   />
                   <span className="text-xs text-slate-500">
-                    I agree to receive emails from ARIA about product updates and offers.
+                    By checking this box, I consent to receive transactional messages from Aria ai related to my account, orders, or services I have requested. These messages may include appointment reminders, order confirmations, and account notifications among others. Message frequency may vary. Message & Data rates may apply. Reply HELP for help or STOP to opt-out.
                   </span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer">
@@ -170,7 +170,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
                     className="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                   />
                   <span className="text-xs text-slate-500">
-                    I agree to receive SMS/calls for demo purposes and account security. Std rates apply.
+                    By checking this box, I consent to receive marketing and promotional messages from Aria Ai, including special offers, discounts, new product updates among others. Message frequency may vary. Message & Data rates may apply. Reply HELP for help or STOP to opt-out.
                   </span>
                 </label>
               </div>

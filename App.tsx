@@ -660,20 +660,48 @@ export default function App() {
         </section>
 
         {/* FOOTER */}
-        <footer className="bg-white border-t border-slate-100 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-             <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-white font-serif font-bold text-xs">A</div>
-                <span className="font-semibold text-slate-900">ARIA</span>
-             </div>
-             <div className="flex gap-8 text-sm text-slate-500">
-               <a href="#" className="hover:text-slate-900">Privacy Policy</a>
-               <a href="#" className="hover:text-slate-900">Terms of Service</a>
-               <a href="#" className="hover:text-slate-900">Contact</a>
-             </div>
-             <div className="text-sm text-slate-400">
-               © {new Date().getFullYear()} ARIA AI Inc. Operations Worldwide.
-             </div>
+        <footer className="bg-slate-900 text-white py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+              <div>
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center font-serif font-bold text-sm">A</div>
+                  <span className="font-bold text-lg">ARIA</span>
+                </div>
+                <p className="text-slate-400 text-sm leading-relaxed">The world's #1 AI Receptionist transforming customer interactions.</p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Product</h4>
+                <div className="flex flex-col gap-3 text-sm">
+                  <a href="#" className="text-slate-400 hover:text-white transition">Features</a>
+                  <a href="#" className="text-slate-400 hover:text-white transition">Pricing</a>
+                  <a href="#" className="text-slate-400 hover:text-white transition">Demo</a>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Legal</h4>
+                <div className="flex flex-col gap-3 text-sm">
+                  <a href="#" className="text-slate-400 hover:text-white transition">Privacy Policy</a>
+                  <a href="#" className="text-slate-400 hover:text-white transition">Terms of Service</a>
+                  <a href="#" className="text-slate-400 hover:text-white transition">Contact</a>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Contact</h4>
+                <div className="flex flex-col gap-3 text-sm text-slate-400">
+                  <div className="hover:text-white transition cursor-default">119 Scarlet Oak Dr.<br/>Phoenixville, PA 19460</div>
+                  <a href="mailto:Open.aria.ai@gmail.com" className="hover:text-white transition">Open.aria.ai@gmail.com</a>
+                  <a href="tel:+15868002870" className="hover:text-white transition">+1 586 800 2870</a>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
+              <p>© {new Date().getFullYear()} ARIA AI Inc. All rights reserved.</p>
+            </div>
           </div>
         </footer>
 
