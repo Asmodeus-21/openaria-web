@@ -1,19 +1,19 @@
 {
   "version": 2,
-  "buildCommand": "vite build && next build && node scripts/generate-sitemap.js",
+  "buildCommand": "vite build && cp -r dist .next/public/static && next build && node scripts/generate-sitemap.js",
   "outputDirectory": ".next",
-  "routes": [
+  "rewrites": [
     {
-      "src": "^/(?!solutions|_next|assets).*\\.(?:js|css|svg|png|jpg|jpeg|gif|ico|webp|woff|woff2)$",
-      "dest": "/dist$0"
+      "source": "/solutions/:industry*",
+      "destination": "/.next/server/pages/solutions/:industry*"
     },
     {
-      "src": "^/(?!solutions|_next|assets)",
-      "dest": "/dist/index.html"
+      "source": "/:path*",
+      "destination": "/static/:path*"
     },
     {
-      "src": "/solutions/:industry*",
-      "dest": "/.next/server/pages/solutions/:industry*"
+      "source": "/:path*",
+      "destination": "/static/index.html"
     }
   ],
   "headers": [
