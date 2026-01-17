@@ -2,10 +2,18 @@
   "version": 2,
   "buildCommand": "vite build && next build && node scripts/generate-sitemap.js",
   "outputDirectory": ".next",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/solutions/:industry*",
-      "destination": "/.next/server/pages/solutions/:industry*"
+      "src": "^/(?!solutions|_next|assets).*\\.(?:js|css|svg|png|jpg|jpeg|gif|ico|webp|woff|woff2)$",
+      "dest": "/dist$0"
+    },
+    {
+      "src": "^/(?!solutions|_next|assets)",
+      "dest": "/dist/index.html"
+    },
+    {
+      "src": "/solutions/:industry*",
+      "dest": "/.next/server/pages/solutions/:industry*"
     }
   ],
   "headers": [
