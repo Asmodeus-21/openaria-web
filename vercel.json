@@ -2,9 +2,6 @@
   "version": 2,
   "buildCommand": "vite build && next build && node scripts/generate-sitemap.js",
   "outputDirectory": ".next",
-  "env": {
-    "VERCEL_ANALYTICS_ID": "@VERCEL_ANALYTICS_ID@"
-  },
   "rewrites": [
     {
       "source": "/solutions/:industry*",
