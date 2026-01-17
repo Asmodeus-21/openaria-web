@@ -14,14 +14,14 @@ export interface PageMetadata {
   structuredData?: any;
 }
 
-const SITE_URL = 'https://www.ariagroups.xyz';
-const COMPANY_NAME = 'ARIA Groups';
-const TWITTER_HANDLE = '@ariareceptionist';
+const SITE_URL = 'https://openaria.app';
+const COMPANY_NAME = 'OpenAria';
+const TWITTER_HANDLE = '@openariahq';
 
 // Home page
 export const HOME_META: PageMetadata = {
-  title: 'AI Receptionist for Businesses | ARIA by Aria Groups',
-  description: 'ARIA is a 24/7 AI receptionist that answers calls, books appointments, and captures leads. Never miss a customer call again.',
+  title: 'AI Receptionist for Businesses | OpenAria',
+  description: 'OpenAria is a 24/7 AI receptionist that answers calls, books appointments, and captures leads. Never miss a customer call again.',
   keywords: ['AI receptionist', 'AI call answering', 'virtual receptionist', 'AI phone service', 'call answering service'],
   canonical: SITE_URL,
   ogType: 'website',
@@ -44,8 +44,8 @@ export const HOME_META: PageMetadata = {
 
 // AI Receptionist page
 export const AI_RECEPTIONIST_META: PageMetadata = {
-  title: 'AI Receptionist for Businesses | ARIA - 24/7 Call Answering',
-  description: 'ARIA AI Receptionist answers calls 24/7, qualifies leads, books appointments, and sends data to your CRM. See how ARIA increases revenue by reducing missed calls.',
+  title: 'AI Receptionist for Businesses | OpenAria - 24/7 Call Answering',
+  description: 'OpenAria AI Receptionist answers calls 24/7, qualifies leads, books appointments, and sends data to your CRM. See how OpenAria increases revenue by reducing missed calls.',
   keywords: ['AI receptionist', 'virtual receptionist', 'AI call answering', 'automated receptionist', 'AI receptionist software'],
   canonical: `${SITE_URL}/ai-receptionist`,
   ogType: 'article',
@@ -66,8 +66,8 @@ export const AI_RECEPTIONIST_META: PageMetadata = {
 
 // AI Call Answering page
 export const AI_CALL_ANSWERING_META: PageMetadata = {
-  title: 'AI Call Answering Service | ARIA - Never Miss a Call Again',
-  description: 'ARIA AI call answering service handles inbound calls, captures lead information, books appointments, and routes urgent calls 24/7. Reduce missed calls by 100%.',
+  title: 'AI Call Answering Service | OpenAria - Never Miss a Call Again',
+  description: 'OpenAria AI call answering service handles inbound calls, captures lead information, books appointments, and routes urgent calls 24/7. Reduce missed calls by 100%.',
   keywords: ['call answering service', 'AI call answering', 'automated call answering', 'virtual phone service', 'after-hours call answering'],
   canonical: `${SITE_URL}/ai-call-answering`,
   ogType: 'article',
@@ -86,29 +86,29 @@ export const AI_CALL_ANSWERING_META: PageMetadata = {
 // Industry pages
 export const INDUSTRY_PAGES: Record<string, PageMetadata> = {
   'real-estate': {
-    title: 'AI Receptionist for Real Estate | ARIA - Qualify Leads Instantly',
-    description: 'ARIA AI receptionist for real estate agents and brokers. Qualify buyer & seller inquiries, schedule showings, capture lead data automatically.',
+    title: 'AI Receptionist for Real Estate | OpenAria - Qualify Leads Instantly',
+    description: 'OpenAria AI receptionist for real estate agents and brokers. Qualify buyer & seller inquiries, schedule showings, capture lead data automatically.',
     keywords: ['AI receptionist for real estate', 'real estate lead generation', 'property inquiry automation', 'real estate phone service'],
     canonical: `${SITE_URL}/industries/real-estate`,
     ogType: 'article'
   },
   'healthcare': {
-    title: 'AI Receptionist for Healthcare | ARIA - HIPAA Compliant Call Handling',
-    description: 'ARIA AI receptionist for medical offices, dental practices, and clinics. Handle appointment requests, patient inquiries, and follow-ups securely.',
+    title: 'AI Receptionist for Healthcare | OpenAria - HIPAA Compliant Call Handling',
+    description: 'OpenAria AI receptionist for medical offices, dental practices, and clinics. Handle appointment requests, patient inquiries, and follow-ups securely.',
     keywords: ['AI receptionist for healthcare', 'medical appointment scheduling', 'clinic phone service', 'HIPAA compliant AI'],
     canonical: `${SITE_URL}/industries/healthcare`,
     ogType: 'article'
   },
   'hvac': {
-    title: 'AI Receptionist for HVAC Companies | ARIA - Emergency Service Dispatch',
-    description: 'ARIA AI receptionist for HVAC contractors. Capture emergency calls, schedule service appointments, dispatch technicians 24/7.',
+    title: 'AI Receptionist for HVAC Companies | OpenAria - Emergency Service Dispatch',
+    description: 'OpenAria AI receptionist for HVAC contractors. Capture emergency calls, schedule service appointments, dispatch technicians 24/7.',
     keywords: ['HVAC dispatch software', 'HVAC scheduling automation', 'plumbing call answering', 'emergency service dispatch'],
     canonical: `${SITE_URL}/industries/hvac`,
     ogType: 'article'
   },
   'law-firms': {
-    title: 'AI Receptionist for Law Firms | ARIA - Client Intake & Lead Capture',
-    description: 'ARIA AI receptionist for lawyers and law firms. Qualify potential clients, capture case information, and route calls to the right attorney.',
+    title: 'AI Receptionist for Law Firms | OpenAria - Client Intake & Lead Capture',
+    description: 'OpenAria AI receptionist for lawyers and law firms. Qualify potential clients, capture case information, and route calls to the right attorney.',
     keywords: ['AI receptionist for law firms', 'legal intake automation', 'client qualification software', 'attorney call handling'],
     canonical: `${SITE_URL}/industries/law-firms`,
     ogType: 'article'
@@ -118,19 +118,19 @@ export const INDUSTRY_PAGES: Record<string, PageMetadata> = {
 // Blog pages
 export const BLOG_PAGES: Record<string, PageMetadata> = {
   'ai-receptionist-vs-human': {
-    title: 'AI Receptionist vs Human: The Complete Comparison | ARIA Blog',
+    title: 'AI Receptionist vs Human: The Complete Comparison | OpenAria Blog',
     description: 'Compare AI receptionists and human receptionists. Learn the pros, cons, and when to use each for your business.',
     keywords: ['AI receptionist vs human', 'virtual receptionist', 'automated vs manual'],
     canonical: `${SITE_URL}/blog/ai-receptionist-vs-human`
   },
   'missed-calls-cost': {
-    title: 'How Missed Calls Cost Your Business Money | ARIA Blog',
+    title: 'How Missed Calls Cost Your Business Money | OpenAria Blog',
     description: 'Discover the hidden costs of missed calls. Learn how lost leads, missed appointments, and reduced revenue add up.',
     keywords: ['missed calls', 'lost business', 'revenue impact', 'lead generation'],
     canonical: `${SITE_URL}/blog/missed-calls-cost`
   },
   'small-business-ai-receptionist': {
-    title: 'Best AI Receptionist for Small Business in 2024 | ARIA',
+    title: 'Best AI Receptionist for Small Business in 2024 | OpenAria',
     description: 'Small business guide to choosing the right AI receptionist. Features, pricing, and implementation tips.',
     keywords: ['AI receptionist small business', 'affordable virtual receptionist', 'small business phone service'],
     canonical: `${SITE_URL}/blog/small-business-ai-receptionist`

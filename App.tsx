@@ -9,12 +9,16 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import Button from './components/Button';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import GetStartedModal from './components/GetStartedModal';
 import AriaVoiceOverlay from './components/AriaVoiceOverlay';
 import LogoTicker from './components/LogoTicker';
 import TestimonialCarousel from './components/TestimonialCarousel';
 import Legal from './components/Legal';
 import SEOHead from './components/SEOHead';
+import StructuredData from './components/StructuredData';
+import BreadcrumbSchema from './components/BreadcrumbSchema';
 import AIReceptionistPage from './components/AIReceptionistPage';
 import AICallAnsweringPage from './components/AICallAnsweringPage';
 import { PricingPlan } from './types';
@@ -445,7 +449,25 @@ export default function App() {
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900">
       <Analytics />
       <SEOHead metadata={HOME_META} />
-      <Header onOpenForm={() => openForm()} onOpenLive={openLive} onNavigateLegal={navigateToLegal} />
+      
+      {/* Structured Data for Knowledge Graph Recognition */}
+      <StructuredData 
+        pricing={PRICING_PLANS.map(plan => ({
+          name: plan.name,
+          price: parseFloat(plan.price.replace(/[^0-9.-]+/g, '')) || 0,
+          currency: 'USD',
+          description: plan.features.join(', ')
+        }))}
+      />
+      
+      {/* Breadcrumb Schema for Home Page */}
+      <BreadcrumbSchema 
+        items={[
+          { name: 'Home', url: 'https://openaria.app' }
+        ]}
+      />
+      
+      <Navbar onOpenForm={() => openForm()} onOpenLive={openLive} onNavigateLegal={navigateToLegal} />
 
       <main>
         {/* HERO */}
@@ -524,6 +546,18 @@ export default function App() {
                   <h3 className="font-semibold text-slate-900 text-lg group-hover:text-slate-800 transition-colors">{feature.title}</h3>
                 </div>
               ))}
+            </div>
+
+            {/* Industry Solutions CTA */}
+            <div className="mt-16 text-center">
+              <p className="text-slate-500 text-lg mb-6">Need a solution for your specific industry?</p>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                onClick={() => window.location.href = '/solutions'}
+              >
+                Explore Industry Solutions
+              </Button>
             </div>
           </div>
         </section>
@@ -769,51 +803,8 @@ export default function App() {
           </div>
         </section>
 
-        {/* FOOTER */}
-        <footer className="bg-slate-900 text-white py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-              <div>
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 rounded bg-blue-500 flex items-center justify-center font-serif font-bold text-sm">A</div>
-                  <span className="font-bold text-lg">ARIA</span>
-                </div>
-                <p className="text-slate-400 text-sm leading-relaxed">The world's #1 AI Receptionist transforming customer interactions.</p>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Product</h4>
-                <div className="flex flex-col gap-3 text-sm">
-                  <a href="#" className="text-slate-400 hover:text-white transition">Features</a>
-                  <a href="#" className="text-slate-400 hover:text-white transition">Pricing</a>
-                  <a href="#" className="text-slate-400 hover:text-white transition">Demo</a>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Legal</h4>
-                <div className="flex flex-col gap-3 text-sm">
-                  <a onClick={() => onNavigateLegal?.('privacy')} href="#legal/privacy" className="text-slate-400 hover:text-white transition cursor-pointer">Privacy Policy</a>
-                  <a onClick={() => onNavigateLegal?.('terms')} href="#legal/terms" className="text-slate-400 hover:text-white transition cursor-pointer">Terms of Service</a>
-                  <a onClick={() => onNavigateLegal?.('contact')} href="#legal/contact" className="text-slate-400 hover:text-white transition cursor-pointer">Contact</a>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">Contact</h4>
-                <div className="flex flex-col gap-3 text-sm text-slate-400">
-                  <div className="hover:text-white transition cursor-default">119 Scarlet Oak Dr.<br/>Phoenixville, PA 19460</div>
-                  <a href="mailto:Open.aria.ai@gmail.com" className="hover:text-white transition">Open.aria.ai@gmail.com</a>
-                  <a href="tel:+15868002870" className="hover:text-white transition">+1 586 800 2870</a>
-                </div>
-              </div>
-            </div>
-            
-            <div className="border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-              <p>© {new Date().getFullYear()} ARIA AI Inc. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
+        {/* FOOTER - Now using new Footer component */}
+        <Footer onNavigateLegal={navigateToLegal} />
 
         {/* Mobile Sticky CTA */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 z-30 safe-bottom">

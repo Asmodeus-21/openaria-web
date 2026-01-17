@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { X, CheckCircle, Loader2 } from 'lucide-react';
 import Button from './Button';
 import { pushLeadToGoHighLevel } from '../services/ghlService';
-import { GHLPayload } from '../types';
+import { GHLPayload, PricingPlan } from '../types';
 
 interface GetStartedModalProps {
   isOpen: boolean;
   onClose: () => void;
   openLiveDemo: () => void;
+  selectedPlan?: PricingPlan | null;
 }
 
-const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, openLiveDemo }) => {
+const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, openLiveDemo, selectedPlan }) => {
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
   

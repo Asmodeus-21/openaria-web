@@ -1,6 +1,17 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /.well-known/assetlinks.json
 
-Sitemap: https://www.ariagroups.xyz/sitemap.xml
+# Disallow private/non-content routes to optimize crawl budget
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /login/
+Disallow: /_next/
+
+# Crawl delay for courtesy (optional, uncomment if needed)
+# Crawl-delay: 1
+
+Sitemap: https://openaria.app/sitemap.xml

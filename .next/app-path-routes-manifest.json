@@ -1,0 +1,5 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/solutions/page": "/solutions",
+  "/solutions/[industry]/page": "/solutions/[industry]"
+}
