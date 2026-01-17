@@ -1,17 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "vite build && next build && mkdir -p .next/public && cp -r dist .next/public/static && node scripts/generate-sitemap.js",
+  "buildCommand": "vite build && cp -r dist/* .next/public/ && next build && node scripts/generate-sitemap.js",
   "outputDirectory": ".next",
-  "rewrites": [
-    {
-      "source": "/:path*",
-      "destination": "/static/:path*"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/static/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
