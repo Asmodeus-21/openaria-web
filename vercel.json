@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "vite build && next build && mkdir -p .next/public && cp -r dist/* .next/public/ && node scripts/generate-sitemap.js",
+  "buildCommand": "next build && node scripts/generate-sitemap.js",
   "outputDirectory": ".next",
   "headers": [
     {
