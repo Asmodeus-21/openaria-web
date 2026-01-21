@@ -44,14 +44,14 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
       await pushLeadToGoHighLevel(payload);
       setStep('success');
 
-      // If it's the trial plan, redirect to Stripe payment page
-      if (selectedPlan && selectedPlan.name === '14-Day Trial' && selectedPlan.stripeLink) {
+      // If a plan is selected and has a Stripe link, redirect to payment page
+      if (selectedPlan && selectedPlan.stripeLink) {
         const stripeUrl = selectedPlan.stripeLink;
         setTimeout(() => {
           window.location.href = stripeUrl;
         }, 1500);
       } else {
-        // For other plans or demo requests, open voice AI
+        // For demo requests without a plan, open voice AI
         setTimeout(() => {
           openLiveDemo();
           onClose();
@@ -62,7 +62,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
       setStep('success');
 
       // Same logic for error case
-      if (selectedPlan && selectedPlan.name === '14-Day Trial' && selectedPlan.stripeLink) {
+      if (selectedPlan && selectedPlan.stripeLink) {
         const stripeUrl = selectedPlan.stripeLink;
         setTimeout(() => {
           window.location.href = stripeUrl;
@@ -160,7 +160,7 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2">All Set!</h2>
             <p className="text-slate-600 mb-6">
-              {selectedPlan && selectedPlan.name === '14-Day Trial'
+              {selectedPlan && selectedPlan.stripeLink
                 ? 'Redirecting you to secure payment...'
                 : 'Starting your conversation with ARIA now...'}
             </p>
