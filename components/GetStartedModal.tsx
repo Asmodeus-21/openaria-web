@@ -50,6 +50,9 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
         setTimeout(() => {
           window.location.href = stripeUrl;
         }, 1500);
+      } else if (selectedPlan && !selectedPlan.stripeLink) {
+        // For Enterprise plan (has plan but no Stripe link), just show thank you
+        // Do nothing - stay on success screen
       } else {
         // For demo requests without a plan, open voice AI
         setTimeout(() => {
@@ -67,6 +70,9 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
         setTimeout(() => {
           window.location.href = stripeUrl;
         }, 1500);
+      } else if (selectedPlan && !selectedPlan.stripeLink) {
+        // For Enterprise plan, just show thank you
+        // Do nothing - stay on success screen
       } else {
         setTimeout(() => {
           openLiveDemo();
@@ -162,13 +168,17 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
             <p className="text-slate-600 mb-6">
               {selectedPlan && selectedPlan.stripeLink
                 ? 'Redirecting you to secure payment...'
-                : 'Starting your conversation with ARIA now...'}
+                : selectedPlan && !selectedPlan.stripeLink
+                  ? 'Thank you for your interest! Our sales team will contact you shortly to discuss Enterprise solutions.'
+                  : 'Starting your conversation with ARIA now...'}
             </p>
-            <div className="animate-pulse flex gap-2 justify-center">
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-100"></div>
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-200"></div>
-            </div>
+            {!(selectedPlan && !selectedPlan.stripeLink) && (
+              <div className="animate-pulse flex gap-2 justify-center">
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-100"></div>
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-200"></div>
+              </div>
+            )}
           </div>
         )}
       </div>
