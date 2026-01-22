@@ -22,6 +22,9 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
     phone: '',
   });
 
+  // Check if this is a payment flow (has Stripe link)
+  const hasStripeLink = selectedPlan?.stripeLink && selectedPlan.stripeLink.length > 0;
+
   if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,23 +40,34 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
       ...formData,
       sourcePage: window.location.pathname,
       timestamp: new Date().toISOString(),
-      tags: ['ARIA - Voice AI Lead'],
+      tags: hasStripeLink 
+        ? ['ARIA - Payment Lead', `Plan: ${selectedPlan?.name}`] 
+        : ['ARIA - Voice AI Lead'],
     };
 
     try {
       await pushLeadToGoHighLevel(payload);
       setStep('success');
-      // Auto-open voice AI after 2 seconds
+      
+      // Redirect to Stripe if payment flow, otherwise open voice demo
       setTimeout(() => {
-        openLiveDemo();
-        onClose();
+        if (hasStripeLink) {
+          window.location.href = selectedPlan!.stripeLink;
+        } else {
+          openLiveDemo();
+          onClose();
+        }
       }, 2000);
     } catch (error) {
       console.error('Submission error', error);
       setStep('success');
       setTimeout(() => {
-        openLiveDemo();
-        onClose();
+        if (hasStripeLink) {
+          window.location.href = selectedPlan!.stripeLink;
+        } else {
+          openLiveDemo();
+          onClose();
+        }
       }, 2000);
     } finally {
       setIsSubmitting(false);
@@ -75,10 +89,12 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
         {step === 'form' ? (
           <div className="p-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-2">
-              Ready to Talk with ARIA?
+              {hasStripeLink ? `Get Started with ${selectedPlan?.name}` : 'Ready to Talk with ARIA?'}
             </h2>
             <p className="text-slate-600 mb-6">
-              Just share your contact info and start your conversation.
+              {hasStripeLink 
+                ? 'Enter your details to proceed to secure checkout.' 
+                : 'Just share your contact info and start your conversation.'}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -129,6 +145,8 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
                   <span className="flex items-center gap-2">
                     <Loader2 size={18} className="animate-spin" /> Processing...
                   </span>
+                ) : hasStripeLink ? (
+                  'Continue to Checkout'
                 ) : (
                   'Start Conversation'
                 )}
@@ -142,7 +160,9 @@ const GetStartedModal: React.FC<GetStartedModalProps> = ({ isOpen, onClose, open
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-2">All Set!</h2>
             <p className="text-slate-600 mb-6">
-              Starting your conversation with ARIA now...
+              {hasStripeLink 
+                ? 'Redirecting you to secure checkout...' 
+                : 'Starting your conversation with ARIA now...'}
             </p>
             <div className="animate-pulse flex gap-2 justify-center">
               <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
