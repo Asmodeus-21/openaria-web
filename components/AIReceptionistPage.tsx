@@ -5,7 +5,7 @@ import SEOHead from './SEOHead';
 import { AI_RECEPTIONIST_META } from '../seo.config';
 import { trackLeadEvent, trackInitiateCheckout } from '../utils/facebookPixel';
 
-const AIReceptionistPage: React.FC<{ openForm: () => void; openLive: () => void }> = ({ openForm, openLive }) => {
+const AIReceptionistPage: React.FC<{ openForm: () => void; openLive: () => void }> = ({ openForm, openLive: _openLive }) => {
   return (
     <>
       <SEOHead metadata={AI_RECEPTIONIST_META} />

@@ -5,7 +5,7 @@ import SEOHead from './SEOHead';
 import { AI_CALL_ANSWERING_META } from '../seo.config';
 import { trackLeadEvent, trackInitiateCheckout } from '../utils/facebookPixel';
 
-const AICallAnsweringPage: React.FC<{ openForm: () => void; openLive: () => void }> = ({ openForm, openLive }) => {
+const AICallAnsweringPage: React.FC<{ openForm: () => void; openLive: () => void }> = ({ openForm, openLive: _openLive }) => {
   return (
     <>
       <SEOHead metadata={AI_CALL_ANSWERING_META} />
